@@ -15,14 +15,15 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  template:
+  staff-svc:
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: template
+    container_name: staff-svc
     environment:
       - MONGODB_URL=${MONGOURL}
+      - PORT=3001
     depends_on:
       - mongodb
     networks:
@@ -30,7 +31,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - .:/template
+      - .:/staff-svc
 
 volumes:
   mongo-data:
