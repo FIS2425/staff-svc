@@ -3,6 +3,7 @@ import cors from 'cors';
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
 import cookieParser from 'cookie-parser';
+import router from './routes/doctorRoute.js';
 
 const swaggerDocument = YAML.load('./openapi.yaml');
 
@@ -13,6 +14,8 @@ export default function () {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+
+  app.use('/', router);
 
   app.get('/', (req, res) => {
     res.send('API funcionando correctamente');
