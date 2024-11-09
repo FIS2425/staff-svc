@@ -49,3 +49,22 @@ export const register = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
+
+// Función para obtener todos los doctores de una clínica filtrados por especialidad
+export const getDoctorsBySpeciality = async (req, res) => {
+  try {
+    const { clinic, speciality } = req.params;
+    let doctors;
+    if (speciality) {
+      // Buscar doctores por clínica y especialidad
+      doctors = await Doctor.find({ clinic, specialty: speciality });
+    } else {
+      // Buscar todos los doctores por clínica
+      doctors = await Doctor.find({ clinic });
+    }
+
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
