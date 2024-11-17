@@ -50,6 +50,7 @@ export const register = async (req, res) => {
   }
 }
 
+
 export const updateDoctorSpeciality = async (req, res) => {
   try {
     const { doctorId } = req.params;
@@ -57,7 +58,6 @@ export const updateDoctorSpeciality = async (req, res) => {
 
     // Buscar el doctor por ID
     const doctor = await Doctor.findById(doctorId);
-
     if (!doctor) {
       logger.error('Doctor not found', {
         method: req.method,
@@ -92,3 +92,56 @@ export const updateDoctorSpeciality = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+export const deleteDoctor = async (req, res) => {
+  try {
+    // if (req.user.roles.includes('Admin')) {
+    const { id } = req.params;
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      logger.error('Doctor not found', {
+        method: req.method,
+        url: req.originalUrl
+      });
+      res.status(404).json({ message: 'Doctor not found' });
+    } else {
+      try {
+        // const authResponse = await axios.delete(`http://${process.env.AUTH_SVC}/${doctor.userId}`);
+        
+        // if (authResponse.status === 200) {
+        await doctor.deleteOne();
+        logger.info(`Doctor ${doctor._id} deleted from database`);
+        
+        res.status(204).send();
+        // } else {
+        //   logger.error('Error deleting user from auth service', {
+        //     method: req.method,
+        //     url: req.originalUrl,
+        //     status: authResponse.status
+        //   });
+        //   res.status(500).json({ message: 'Error deleting user from auth service' });
+        //   return;
+        // }
+      } catch (error) {
+        logger.error('Error deleting user', {
+          method: req.method,
+          url: req.originalUrl,
+          error: error
+        });
+      }
+    }
+    
+    // } else {
+    //   logger.error('User is not an admin', {
+    //     method: req.method,
+    //     url: req.originalUrl
+    //   });
+    //   res.status(403).json({ message: 'Forbidden' });
+    // }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+

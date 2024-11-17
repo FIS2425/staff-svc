@@ -15,7 +15,7 @@ export default function () {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  app.use('/', router);
+  app.use('/staff/', router);
 
   app.get('/', (req, res) => {
     res.send('API funcionando correctamente');
