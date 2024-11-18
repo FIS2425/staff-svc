@@ -50,6 +50,50 @@ export const register = async (req, res) => {
   }
 }
 
+
+export const updateDoctorSpeciality = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const { specialty } = req.body;
+
+    // Buscar el doctor por ID
+    const doctor = await Doctor.findById(doctorId);
+    if (!doctor) {
+      logger.error('Doctor not found', {
+        method: req.method,
+        url: req.originalUrl
+      });
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    // Verificar que el usuario autenticado es el mismo que el usuario del doctor
+    // if (doctor.userId !== req.user.id) {
+    //   logger.error('Unauthorized attempt to update speciality', {
+    //     method: req.method,
+    //     url: req.originalUrl,
+    //     userId: req.user.id
+    //   });
+    //   return res.status(403).json({ message: 'Forbidden: You can only update your own speciality' });
+    // }
+
+    // Actualizar la especialidad del doctor
+    doctor.specialty = specialty;
+    await doctor.save();
+
+    logger.info(`Doctor ${doctor._id} speciality updated to ${specialty}`);
+    res.status(200).json({ message: 'Speciality updated successfully', doctor });
+
+  } catch (error) {
+    logger.error('Error updating doctor speciality', {
+      method: req.method,
+      url: req.originalUrl,
+      error: error.message
+    });
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
 export const deleteDoctor = async (req, res) => {
   try {
     // if (req.user.roles.includes('Admin')) {
@@ -100,3 +144,4 @@ export const deleteDoctor = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
+
