@@ -8,6 +8,40 @@ servers:
   - url: http://localhost:3001
 
 paths:
+/staff/{doctorId}/update:
+  put:
+    summary: Update a doctor's specialty
+    parameters:
+      - in: path
+        name: doctorId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              specialty:
+                type: string
+    responses:
+      '200':
+        description: Specialty updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                doctor:
+                  $ref: '#/components/schemas/Doctor'
+      '404':
+        description: Doctor not found
+      '400':
+        description: Invalid input
   /staff/register:
     post:
       summary: Register a new doctor
