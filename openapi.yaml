@@ -8,7 +8,34 @@ servers:
   - url: http://localhost:3001
 
 paths:
-/staff/{doctorId}/update:
+/staff/clinic/{clinic}/speciality/{speciality}:
+  get:
+    summary: Get doctors by speciality in a clinic
+    parameters:
+      - in: path
+        name: clinic
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: speciality
+        required: false
+        schema:
+          type: string
+    responses:
+      '200':
+        description: List of doctors
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doctor'
+      '404':
+        description: No doctors found
+      '400':
+        description: Invalid input
+/staff/{doctorId}:
   put:
     summary: Update a doctor's specialty
     parameters:
@@ -76,7 +103,7 @@ paths:
         '400':
           description: Invalid input
 
-  /staff/{id}:
+  /staff/{doctorId}:
     delete:
       summary: Delete a doctor by ID
       parameters:
