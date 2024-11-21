@@ -25,13 +25,19 @@ export const register = async (req, res) => {
       });
 
       await doctor.save();
-      logger.info(`Doctor ${doctor._id} created`);
+      logger.info(`Doctor ${doctor._id} created`, {
+        method: req.method,
+        url: req.originalUrl,
+        appointmentId: doctor._id,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip
+      });
       res.status(201).json(doctor);
 
     } catch (error) {
       logger.error('Invalid credentials', {
         method: req.method,
         url: req.originalUrl,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
         error: error
       });
 
@@ -40,7 +46,8 @@ export const register = async (req, res) => {
     // } else {
     //   logger.error('User is not an admin', {
     //     method: req.method,
-    //     url: req.originalUrl
+    //     url: req.originalUrl,
+    //     ip: req.headers && req.headers['x-forwarded-for'] || req.ip
     //   });
     //   res.status(403).json({ message: 'Forbidden' });
     // }
@@ -54,6 +61,7 @@ export const register = async (req, res) => {
 export const getDoctorsBySpeciality = async (req, res) => {
   try {
     const { clinic, speciality } = req.params;
+
     let doctors;
     if (speciality) {
       // Buscar doctores por clínica y especialidad
@@ -63,8 +71,32 @@ export const getDoctorsBySpeciality = async (req, res) => {
       doctors = await Doctor.find({ clinic });
     }
 
+    if (doctors.length === 0) {
+      logger.error('No doctors found for the given clinic and speciality', {
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+        clinic,
+        speciality
+      });
+      return res.status(404).json({ message: 'No doctors found for the given clinic and speciality' });
+    }
+
+    logger.info('Doctors retrieved successfully', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      clinic,
+      speciality
+    });
     res.status(200).json(doctors);
   } catch (error) {
+    logger.error('Error retrieving doctors', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      error: error.message
+    });
     res.status(400).json({ message: error.message });
   }
 }
@@ -79,7 +111,8 @@ export const updateDoctorSpeciality = async (req, res) => {
     if (!doctor) {
       logger.error('Doctor not found', {
         method: req.method,
-        url: req.originalUrl
+        url: req.originalUrl,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip
       });
       return res.status(404).json({ message: 'Doctor not found' });
     }
@@ -98,14 +131,21 @@ export const updateDoctorSpeciality = async (req, res) => {
     doctor.specialty = specialty;
     await doctor.save();
 
-    logger.info(`Doctor ${doctor._id} speciality updated to ${specialty}`);
+    logger.info(`Doctor ${doctor._id} speciality updated to ${specialty}`, {
+      method: req.method,
+      url: req.originalUrl,
+      doctorId: doctor._id,
+      specialty,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip
+    });
     res.status(200).json({ message: 'Speciality updated successfully', doctor });
 
   } catch (error) {
     logger.error('Error updating doctor speciality', {
       method: req.method,
       url: req.originalUrl,
-      error: error.message
+      error: error.message,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip
     });
     res.status(400).json({ message: error.message });
   }
@@ -115,13 +155,14 @@ export const updateDoctorSpeciality = async (req, res) => {
 export const deleteDoctor = async (req, res) => {
   try {
     // if (req.user.roles.includes('Admin')) {
-    const { id } = req.params;
-    const doctor = await Doctor.findById(id);
+    const { doctorId } = req.params;
+    const doctor = await Doctor.findById(doctorId);
 
     if (!doctor) {
       logger.error('Doctor not found', {
         method: req.method,
-        url: req.originalUrl
+        url: req.originalUrl,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip
       });
       res.status(404).json({ message: 'Doctor not found' });
     } else {
@@ -130,7 +171,12 @@ export const deleteDoctor = async (req, res) => {
         
         // if (authResponse.status === 200) {
         await doctor.deleteOne();
-        logger.info(`Doctor ${doctor._id} deleted from database`);
+        logger.info(`Doctor ${doctor._id} deleted from database`,  {
+          method: req.method,
+          url: req.originalUrl,
+          appointmentId: doctor._id,
+          ip: req.headers && req.headers['x-forwarded-for'] || req.ip
+        });
         
         res.status(204).send();
         // } else {
@@ -146,6 +192,7 @@ export const deleteDoctor = async (req, res) => {
         logger.error('Error deleting user', {
           method: req.method,
           url: req.originalUrl,
+          ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
           error: error
         });
       }
