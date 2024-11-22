@@ -2,17 +2,34 @@ import Doctor from '../schemas/Doctor.js';
 import axios from 'axios';
 
 import logger from '../config/logger.js';
+import { registerValidator } from '../utils/validation.js';
 
 export const register = async (req, res) => {
   try {
-    // if (req.user.roles.includes('Admin')) {
     const { name, surname, specialty, dni, clinic, password, email } = req.body;
+    const { error } = registerValidator().validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    // Check if a doctor with the same DNI already exists
+    const existingDoctor = await Doctor.findOne({ dni });
+    if (existingDoctor) {
+      return res.status(400).json({ message: 'A doctor with the same DNI already exists' });
+    }
+
     try {
-    //   const authResponse = await axios.post(`http://${process.env.AUTH_SVC}/register`, {
-    //     password,
-    //     email,
-    //     roles: ['Doctor']
-    //   });
+
+      const authResponse = await axios.post(`${process.env.AUTH_SVC}/users`, {
+        password,
+        email,
+        roles: ['doctor']
+      }, {
+        withCredentials: true,
+        headers: {
+          Cookie: `token=${req.token}`
+        }
+      });
 
       const doctor = new Doctor({
         name,
@@ -20,8 +37,7 @@ export const register = async (req, res) => {
         specialty,
         dni,
         clinic,
-        // userId: authResponse.data._id
-        userId: '38e37cc7-992a-4530-a381-fd907fb921b3'
+        userId: authResponse.data._id
       });
 
       await doctor.save();
@@ -34,7 +50,7 @@ export const register = async (req, res) => {
       res.status(201).json(doctor);
 
     } catch (error) {
-      logger.error('Invalid credentials', {
+      logger.error('Could not create an user', {
         method: req.method,
         url: req.originalUrl,
         ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
@@ -43,16 +59,14 @@ export const register = async (req, res) => {
 
       res.status(400).json({ message: error.message });
     }
-    // } else {
-    //   logger.error('User is not an admin', {
-    //     method: req.method,
-    //     url: req.originalUrl,
-    //     ip: req.headers && req.headers['x-forwarded-for'] || req.ip
-    //   });
-    //   res.status(403).json({ message: 'Forbidden' });
-    // }
-
   } catch (error) {
+    logger.error('Could not create a doctor', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      error: error
+    })
+
     res.status(400).json({ message: error.message });
   }
 }
@@ -117,16 +131,6 @@ export const updateDoctorSpeciality = async (req, res) => {
       return res.status(404).json({ message: 'Doctor not found' });
     }
 
-    // Verificar que el usuario autenticado es el mismo que el usuario del doctor
-    // if (doctor.userId !== req.user.id) {
-    //   logger.error('Unauthorized attempt to update speciality', {
-    //     method: req.method,
-    //     url: req.originalUrl,
-    //     userId: req.user.id
-    //   });
-    //   return res.status(403).json({ message: 'Forbidden: You can only update your own speciality' });
-    // }
-
     // Actualizar la especialidad del doctor
     doctor.specialty = specialty;
     await doctor.save();
@@ -154,7 +158,6 @@ export const updateDoctorSpeciality = async (req, res) => {
 
 export const deleteDoctor = async (req, res) => {
   try {
-    // if (req.user.roles.includes('Admin')) {
     const { doctorId } = req.params;
     const doctor = await Doctor.findById(doctorId);
 
@@ -167,27 +170,32 @@ export const deleteDoctor = async (req, res) => {
       res.status(404).json({ message: 'Doctor not found' });
     } else {
       try {
-        // const authResponse = await axios.delete(`http://${process.env.AUTH_SVC}/${doctor.userId}`);
-        
-        // if (authResponse.status === 200) {
-        await doctor.deleteOne();
-        logger.info(`Doctor ${doctor._id} deleted from database`,  {
-          method: req.method,
-          url: req.originalUrl,
-          appointmentId: doctor._id,
-          ip: req.headers && req.headers['x-forwarded-for'] || req.ip
+        const authResponse = await axios.delete(`${process.env.AUTH_SVC}/users/${doctor.userId}`, {
+          withCredentials: true,
+          headers: {
+            Cookie: `token=${req.token}`
+          }
         });
         
-        res.status(204).send();
-        // } else {
-        //   logger.error('Error deleting user from auth service', {
-        //     method: req.method,
-        //     url: req.originalUrl,
-        //     status: authResponse.status
-        //   });
-        //   res.status(500).json({ message: 'Error deleting user from auth service' });
-        //   return;
-        // }
+        if (authResponse.status === 204) {
+          await doctor.deleteOne();
+          logger.info(`Doctor ${doctor._id} deleted from database`,  {
+            method: req.method,
+            url: req.originalUrl,
+            appointmentId: doctor._id,
+            ip: req.headers && req.headers['x-forwarded-for'] || req.ip
+          });
+        
+          res.status(204).send();
+        } else {
+          logger.error('Error deleting user from auth service', {
+            method: req.method,
+            url: req.originalUrl,
+            status: authResponse.status
+          });
+          res.status(500).json({ message: 'Error deleting user from auth service' });
+          return;
+        }
       } catch (error) {
         logger.error('Error deleting user', {
           method: req.method,
@@ -197,14 +205,6 @@ export const deleteDoctor = async (req, res) => {
         });
       }
     }
-    
-    // } else {
-    //   logger.error('User is not an admin', {
-    //     method: req.method,
-    //     url: req.originalUrl
-    //   });
-    //   res.status(403).json({ message: 'Forbidden' });
-    // }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
