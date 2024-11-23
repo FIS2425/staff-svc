@@ -6,7 +6,7 @@ import { registerValidator } from '../utils/validation.js';
 
 export const register = async (req, res) => {
   try {
-    const { name, surname, specialty, dni, clinic, password, email } = req.body;
+    const { name, surname, specialty, dni, clinicId, password, email } = req.body;
     const { error } = registerValidator().validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
@@ -36,7 +36,7 @@ export const register = async (req, res) => {
         surname,
         specialty,
         dni,
-        clinic,
+        clinicId,
         userId: authResponse.data._id
       });
 
@@ -74,33 +74,33 @@ export const register = async (req, res) => {
 // Función para obtener todos los doctores de una clínica filtrados por especialidad
 export const getDoctorsBySpeciality = async (req, res) => {
   try {
-    const { clinic, speciality } = req.params;
+    const { clinicId, speciality } = req.params;
 
     let doctors;
     if (speciality) {
       // Buscar doctores por clínica y especialidad
-      doctors = await Doctor.find({ clinic, specialty: speciality });
+      doctors = await Doctor.find({ clinicId, specialty: speciality });
     } else {
       // Buscar todos los doctores por clínica
-      doctors = await Doctor.find({ clinic });
+      doctors = await Doctor.find({ clinicId });
     }
 
     if (doctors.length === 0) {
-      logger.error('No doctors found for the given clinic and speciality', {
+      logger.error('No doctors found for the given clinicId and speciality', {
         method: req.method,
         url: req.originalUrl,
         ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
-        clinic,
+        clinicId,
         speciality
       });
-      return res.status(404).json({ message: 'No doctors found for the given clinic and speciality' });
+      return res.status(404).json({ message: 'No doctors found for the given clinicId and speciality' });
     }
 
     logger.info('Doctors retrieved successfully', {
       method: req.method,
       url: req.originalUrl,
       ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
-      clinic,
+      clinicId,
       speciality
     });
     res.status(200).json(doctors);

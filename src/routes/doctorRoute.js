@@ -6,7 +6,7 @@ import { verifyAdmin } from '../middleware/verifyAdmin.js';
 const router = express.Router();
 
 router.post('/register', verifyAuth, verifyAdmin, register);
-router.get('/clinic/:clinic/speciality/:speciality?', getDoctorsBySpeciality);
+router.get('/clinic/:clinicId/speciality/:speciality?', getDoctorsBySpeciality);
 router.put('/:doctorId', verifyAuth, verifyAdmin, updateDoctorSpeciality);
 router.delete('/:doctorId', verifyAuth, verifyAdmin, deleteDoctor);
 

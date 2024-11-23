@@ -44,8 +44,13 @@ const doctorSchema = new mongoose.Schema({
       message: props => `${props.value} is not a valid DNI number!`
     }
   },
-  clinic: {
+  clinicId: {
     type: String,
+    default: () => uuidv4(),
+    validate: {
+      validator: uuidValidate,
+      message: (props) => `${props.value} no es un UUID válido`,
+    },
     required: true
   },
   active: {
@@ -54,7 +59,13 @@ const doctorSchema = new mongoose.Schema({
   },
   userId: {
     type: String,
-    required: true
+    default: () => uuidv4(),
+    validate: {
+      validator: uuidValidate,
+      message: (props) => `${props.value} no es un UUID válido`,
+    },
+    required: true,
+    unique: true
   }
 }, {
   timestamps: true
