@@ -16,7 +16,7 @@ beforeEach(async () => {
     surname: 'Doe',
     specialty: 'cardiology',
     dni: '64781738F',
-    clinic: 'Clinic A',
+    clinicId: '27163ac7-4f4d-4669-a0c1-4b8538405475',
     password: 'password123',
     email: 'johndoe@example.com',
   };
@@ -44,7 +44,7 @@ describe('STAFF TEST', () => {
         surname: 'Smith',
         specialty: 'neurology',
         dni: '20060493P',
-        clinic: 'Clinic B',
+        clinic: '51fdcf6c-4ca5-4983-8c3e-8b7a01c3429c',
         password: 'password123',
         email: 'janesmith@example.com',
       };
@@ -55,15 +55,15 @@ describe('STAFF TEST', () => {
     });
   });
 
-  describe('test GET /staff/clinic/:clinic/speciality/:speciality?', () => {
+  describe('test GET /staff/clinic/:clinicId/speciality/:speciality?', () => {
     it('should return 200 and all doctors for a clinic', async () => {
-      const response = await request.get('/staff/clinic/Clinic%20A/speciality/cardiology');
+      const response = await request.get('/staff/clinic/27163ac7-4f4d-4669-a0c1-4b8538405475/speciality/cardiology');
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
     });
 
     it('should return 404 if no doctors are found for the given clinic and speciality', async () => {
-      const response = await request.get('/staff/clinic/NonExistentClinic/speciality/NonExistentSpeciality');
+      const response = await request.get('/staff/clinic/1854ab8f-41c5-4de9-b027-4acbd276320a/speciality/NonExistentSpeciality');
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('No doctors found for the given clinic and speciality');
     });
