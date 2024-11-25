@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mongodb:
     restart: unless-stopped
@@ -30,8 +28,6 @@ services:
       - backend
     ports:
       - "3001:3001"
-    volumes:
-      - .:/staff-svc
 
 volumes:
   mongo-data:
