@@ -7,7 +7,7 @@ const doctorSchema = new mongoose.Schema({
     default: () => uuidv4(),
     validate: {
       validator: uuidValidate,
-      message: (props) => `${props.value} no es un UUID válido`,
+      message: (props) => `${props.value} is not a valid UUID!`,
     },
   },
   name: {
@@ -49,7 +49,7 @@ const doctorSchema = new mongoose.Schema({
     default: () => uuidv4(),
     validate: {
       validator: uuidValidate,
-      message: (props) => `${props.value} no es un UUID válido`,
+      message: (props) => `${props.value} is not a valid UUID!`,
     },
     required: true
   },
@@ -62,7 +62,7 @@ const doctorSchema = new mongoose.Schema({
     default: () => uuidv4(),
     validate: {
       validator: uuidValidate,
-      message: (props) => `${props.value} no es un UUID válido`,
+      message: (props) => `${props.value} is not a valid UUID!`,
     },
     required: true,
     unique: true
