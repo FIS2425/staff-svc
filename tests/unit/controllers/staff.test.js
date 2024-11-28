@@ -65,7 +65,23 @@ describe('STAFF TEST', () => {
     it('should return 404 if no doctors are found for the given clinic and speciality', async () => {
       const response = await request.get('/staff/clinic/1854ab8f-41c5-4de9-b027-4acbd276320a/speciality/NonExistentSpeciality');
       expect(response.status).toBe(404);
-      expect(response.body.message).toBe('No doctors found for the given clinic and speciality');
+      expect(response.body.message).toBe('No doctors found for the given clinicId and speciality');
+    });
+  });
+  
+  describe('test GET /staff/:doctorId', () => {
+    it('should return 200 and the doctor if the doctor is found', async () => {
+      const response = await request.get(`/staff/${doctorId}`);
+      expect(response.status).toBe(200);
+      expect(response.body._id).toBe(doctorId);
+      expect(response.body.name).toBe('John');
+      expect(response.body.surname).toBe('Doe');
+    });
+
+    it('should return 404 if the doctor is not found', async () => {
+      const response = await request.get(`/staff/${uuidv4()}`);
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe('Doctor not found');
     });
   });
 

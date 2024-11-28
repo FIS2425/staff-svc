@@ -19,7 +19,6 @@ export const register = async (req, res) => {
     }
 
     try {
-
       const authResponse = await axios.post(`${process.env.AUTH_SVC}/users`, {
         password,
         email,
@@ -70,6 +69,40 @@ export const register = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
+
+// Get by Id
+export const getDoctorById = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const doctor = await Doctor.findById(doctorId);
+
+    if (!doctor) {
+      logger.error('Doctor not found', {
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+        doctorId
+      });
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    logger.info('Doctor retrieved successfully', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      doctorId
+    });
+    res.status(200).json(doctor);
+  } catch (error) {
+    logger.error('Error retrieving doctor', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      error: error.message
+    });
+    res.status(400).json({ message: error.message });
+  }
+};
 
 // Función para obtener todos los doctores de una clínica filtrados por especialidad
 export const getDoctorsBySpeciality = async (req, res) => {
