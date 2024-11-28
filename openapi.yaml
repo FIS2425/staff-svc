@@ -130,3 +130,39 @@ paths:
           description: List of doctors
         '404':
           description: No doctors found
+
+  /staff/me:
+    get:
+      summary: Get authenticated doctor
+      tags:
+        - staff
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Authenticated doctor retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  specialty:
+                    type: string
+                  dni:
+                    type: string
+                  clinicId:
+                    type: string
+                  email:
+                    type: string
+                  userId:
+                    type: string
+        '404':
+          description: Authenticated doctor not found
+        '400':
+          description: Error retrieving authenticated doctor

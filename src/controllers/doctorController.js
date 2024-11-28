@@ -69,6 +69,40 @@ export const register = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
+// Get me
+export const getMe = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const doctor = await Doctor.findOne({ userId });
+
+    if (!doctor) {
+      logger.error('Authenticated doctor not found', {
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+        userId
+      });
+      return res.status(404).json({ message: 'Authenticated doctor not found' });
+    }
+
+    logger.info('Doctor retrieved successfully', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      doctorId: doctor._id
+    });
+    res.status(200).json(doctor);
+  } catch (error) {
+    logger.error('Error retrieving authenticated doctor', {
+      method: req.method,
+      url: req.originalUrl,
+      ip: req.headers && req.headers['x-forwarded-for'] || req.ip,
+      error: error.message
+    });
+    res.status(400).json({ message: 'Error retrieving authenticated doctor. Please try again later.' });
+  }
+}
+
 
 // Get by Id
 export const getDoctorById = async (req, res) => {
