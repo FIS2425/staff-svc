@@ -1,16 +1,39 @@
-import { beforeAll,beforeEach, afterAll, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 import * as db from '@tests/setup/database';
 import { request } from '@tests/setup/setup';
 import { v4 as uuidv4 } from 'uuid';
+import nock from 'nock';
+import jwt from 'jsonwebtoken';
 
 let doctorId;
+
+const clinicAdmin = {
+  _id: uuidv4(),
+  email: 'testuser2@mail.com',
+  password: 'pAssw0rd!',
+  roles: ['clinicadmin'],
+}
 
 beforeAll(async () => {
   await db.clearDatabase();
 });
 
 beforeEach(async () => {
-  // Registrar un doctor de la Clinic A usando POST /staff/register
+  // Mock the response from the authentication microservice
+  nock(process.env.AUTH_SVC || process.env.VITE_AUTH_SVC)
+    .post('/users')
+    .reply(201, { _id: uuidv4() });
+  nock(process.env.AUTH_SVC || process.env.VITE_AUTH_SVC)
+    .delete(/\/users\/.*/)
+    .reply(204);
+
+  const token = jwt.sign(
+    { userId: clinicAdmin._id, roles: clinicAdmin.roles },
+    process.env.JWT_SECRET || process.env.VITE_JWT_SECRET,
+  );
+  request.set('Cookie', `token=${token}`);
+
+  // Register a doctor from Clinic A using POST /staff/register
   const newDoctor = {
     name: 'John',
     surname: 'Doe',
@@ -24,6 +47,10 @@ beforeEach(async () => {
   doctorId = response.body._id;
 });
 
+afterEach(() => {
+  vi.clearAllMocks();
+  nock.cleanAll(); // Clear all nock interceptors
+});
 
 
 afterAll(async () => {
@@ -44,10 +71,16 @@ describe('STAFF TEST', () => {
         surname: 'Smith',
         specialty: 'neurology',
         dni: '20060493P',
-        clinic: '51fdcf6c-4ca5-4983-8c3e-8b7a01c3429c',
+        clinicId: '51fdcf6c-4ca5-4983-8c3e-8b7a01c3429c',
         password: 'password123',
         email: 'janesmith@example.com',
       };
+
+      // Mock the response from the authentication microservice
+      nock(process.env.AUTH_SVC || process.env.VITE_AUTH_SVC)
+        .post('/users')
+        .reply(201, { _id: uuidv4() });
+
       const response = await request.post('/staff/register').send(newDoctor2);
       expect(response.status).toBe(201);
       expect(response.body.name).toBe(newDoctor2.name);
@@ -62,7 +95,7 @@ describe('STAFF TEST', () => {
       expect(Array.isArray(response.body)).toBe(true);
     });
 
-    it('should return 404 if no doctors are found for the given clinic and speciality', async () => {
+    it('should return 404 if no doctors are found for the given clinic and speciality', async () => {      
       const response = await request.get('/staff/clinic/1854ab8f-41c5-4de9-b027-4acbd276320a/speciality/NonExistentSpeciality');
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('No doctors found for the given clinicId and speciality');
