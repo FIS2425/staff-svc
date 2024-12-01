@@ -19,7 +19,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  // Mock de la respuesta del microservicio de autenticación
+  // Mock the response from the authentication microservice
   nock(process.env.AUTH_SVC || process.env.VITE_AUTH_SVC)
     .post('/users')
     .reply(201, { _id: uuidv4() });
@@ -33,7 +33,7 @@ beforeEach(async () => {
   );
   request.set('Cookie', `token=${token}`);
 
-  // Registrar un doctor de la Clinic A usando POST /staff/register
+  // Register a doctor from Clinic A using POST /staff/register
   const newDoctor = {
     name: 'John',
     surname: 'Doe',
@@ -49,7 +49,7 @@ beforeEach(async () => {
 
 afterEach(() => {
   vi.clearAllMocks();
-  nock.cleanAll(); // Limpia todos los interceptores de nock
+  nock.cleanAll(); // Clear all nock interceptors
 });
 
 
@@ -76,7 +76,7 @@ describe('STAFF TEST', () => {
         email: 'janesmith@example.com',
       };
 
-      // Mock de la respuesta del microservicio de autenticación
+      // Mock the response from the authentication microservice
       nock(process.env.AUTH_SVC || process.env.VITE_AUTH_SVC)
         .post('/users')
         .reply(201, { _id: uuidv4() });
