@@ -134,6 +134,7 @@ describe('Doctor model', () => {
     let error;
   
     try {
+      await new Promise(resolve => setTimeout(resolve, 100));
       await doctor2.save();
     } catch (e) {
       console.log(e)

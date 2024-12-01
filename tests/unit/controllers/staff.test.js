@@ -10,7 +10,7 @@ let doctorId;
 const clinicAdmin = {
   _id: uuidv4(),
   email: 'testuser2@mail.com',
-  password: 'pAssw0rd!',
+  password: 'Passw0rd!',
   roles: ['clinicadmin'],
 }
 
@@ -40,10 +40,11 @@ beforeEach(async () => {
     specialty: 'cardiology',
     dni: '64781738F',
     clinicId: '27163ac7-4f4d-4669-a0c1-4b8538405475',
-    password: 'password123',
+    password: 'Passw0rd!',
     email: 'johndoe@example.com',
   };
   const response = await request.post('/staff/register').send(newDoctor);
+  console.log(response.body);
   doctorId = response.body._id;
 });
 
@@ -72,7 +73,7 @@ describe('STAFF TEST', () => {
         specialty: 'neurology',
         dni: '20060493P',
         clinicId: '51fdcf6c-4ca5-4983-8c3e-8b7a01c3429c',
-        password: 'password123',
+        password: 'Passw0rd!',
         email: 'janesmith@example.com',
       };
 
