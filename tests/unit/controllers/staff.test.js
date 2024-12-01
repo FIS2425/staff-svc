@@ -6,6 +6,7 @@ import nock from 'nock';
 import jwt from 'jsonwebtoken';
 
 let doctorId;
+let userId;
 
 const clinicAdmin = {
   _id: uuidv4(),
@@ -45,6 +46,7 @@ beforeEach(async () => {
   };
   const response = await request.post('/staff/register').send(newDoctor);
   doctorId = response.body._id;
+  userId = response.body.userId;
 });
 
 afterEach(() => {
@@ -115,6 +117,35 @@ describe('STAFF TEST', () => {
       const response = await request.get(`/staff/${uuidv4()}`);
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('Doctor not found');
+    });
+  });
+
+  describe('test GET /staff/me', () => {
+    it('should return 200 and the authenticated doctor if the token is valid', async () => {
+
+      const doctorToken = jwt.sign(
+        { userId: userId, roles: ['doctor'] },
+        process.env.JWT_SECRET || process.env.VITE_JWT_SECRET,
+      );
+
+      request.set('Cookie', `token=${doctorToken}`);
+      const response = await request.get('/staff/me');
+      expect(response.status).toBe(200);
+      expect(response.body._id).toBe(doctorId);
+      expect(response.body.name).toBe('John');
+      expect(response.body.surname).toBe('Doe');
+    });
+
+    it('should return 404 if the token belongs to another doctor', async () => {
+      const anotherDoctorToken = jwt.sign(
+        { userId: uuidv4(), roles: ['doctor'] },
+        process.env.JWT_SECRET || process.env.VITE_JWT_SECRET,
+      );
+      request.set('Cookie', `token=${anotherDoctorToken}`);
+
+      const response = await request.get('/staff/me');
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe('Authenticated doctor not found');
     });
   });
 
