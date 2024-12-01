@@ -117,28 +117,29 @@ describe('Doctor model', () => {
       clinicId: '51fdcf6c-4ca5-4983-8c3e-8b7a01c3429c',
       userId: '27163ac7-4f4d-4669-a0c1-4b8538405475'
     };
-
+  
     const doctorData2 = {
       name: 'Jane',
       surname: 'Smith',
       specialty: 'neurology',
-      dni: '12345678Z', // Same DNI as doctorData1
+      dni: '12345678Z', // Mismo DNI que doctorData1
       clinicId: '51fdcf6c-4ca5-4983-8c3e-8b7a01c3429c',
       userId: '1854ab8f-41c5-4de9-b027-4acbd276320a'
     };
-
+  
     const doctor1 = new Doctor(doctorData1);
     await doctor1.save();
-
+  
     const doctor2 = new Doctor(doctorData2);
     let error;
-
+  
     try {
       await doctor2.save();
     } catch (e) {
+      console.log(e)
       error = e;
     }
-
+  
     expect(error).toBeDefined();
     expect(error.message).toContain('duplicate key error');
   });

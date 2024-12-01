@@ -4,6 +4,8 @@ import axios from 'axios';
 import logger from '../config/logger.js';
 import { registerValidator } from '../utils/validation.js';
 
+const AUTH_SVC = process.env.AUTH_SVC || process.env.VITE_AUTH_SVC;
+
 export const register = async (req, res) => {
   try {
     const { name, surname, specialty, dni, clinicId, password, email } = req.body;
@@ -19,7 +21,7 @@ export const register = async (req, res) => {
     }
 
     try {
-      const authResponse = await axios.post(`${process.env.AUTH_SVC}/users`, {
+      const authResponse = await axios.post(`${AUTH_SVC}/users`, {
         password,
         email,
         roles: ['doctor']
@@ -237,7 +239,7 @@ export const deleteDoctor = async (req, res) => {
       res.status(404).json({ message: 'Doctor not found' });
     } else {
       try {
-        const authResponse = await axios.delete(`${process.env.AUTH_SVC}/users/${doctor.userId}`, {
+        const authResponse = await axios.delete(`${AUTH_SVC}/users/${doctor.userId}`, {
           withCredentials: true,
           headers: {
             Cookie: `token=${req.token}`
