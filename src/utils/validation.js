@@ -22,10 +22,31 @@ export const registerValidator = () => {
       return value;
     }),
     clinicId: Joi.string().required(),
-    password: Joi.string().min(6).required(),
+    password: Joi.string()
+      .min(8)
+      .max(32)
+      .pattern(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/,
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+      )
+      .custom((value, helpers) => {
+        if (/\s/.test(value)) {
+          return helpers.message('Password must not contain spaces');
+        }
+        return value;
+      })
+      .required()
+      .messages({
+        'string.min': 'Password must be at least 8 characters long',
+        'string.max': 'Password must be at most 32 characters long',
+        'string.pattern.name': '{#label}',
+        'any.required': 'Password is required',
+      }),
+
     email: Joi.string().email().required()
   });
 
   return registerValidator;
 };
+       
 
