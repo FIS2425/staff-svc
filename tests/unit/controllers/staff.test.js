@@ -45,7 +45,6 @@ beforeEach(async () => {
     email: 'johndoe@example.com',
   };
   const response = await request.post('/staff/register').send(newDoctor);
-  console.log(response.body);
   doctorId = response.body._id;
   userId = response.body.userId;
 });
