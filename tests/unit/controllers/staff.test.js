@@ -17,7 +17,6 @@ const clinicAdmin = {
 
 beforeAll(async () => {
   await db.clearDatabase();
-  console.log('HOLAAA'+process.env.API_PREFIX || process.env.VITE_API_PREFIX)
 });
 
 beforeEach(async () => {

@@ -15,7 +15,8 @@
     "lint": "eslint . --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
     "lint-fix": "eslint . --fix --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
     "dev": "node --watch --env-file=.env ./src/config/index.js",
-    "test": "vitest",
+    "test:unit": "vitest --config vitest.unit.config.js tests/unit/",
+    "test:integration": "vitest --config vitest.integration.config.js tests/integration/",
     "test:watch": "vitest --watch",
     "populate": "node ./populators/runPopulator.js"
   },
