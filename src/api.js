@@ -15,7 +15,7 @@ export default function () {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  app.use('/staff/', router);
+  app.use(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/', router);
 
   app.get('/', (req, res) => {
     res.send('API funcionando correctamente');
