@@ -17,6 +17,7 @@ const clinicAdmin = {
 
 beforeAll(async () => {
   await db.clearDatabase();
+  console.log('HOLAAA'+process.env.API_PREFIX || process.env.VITE_API_PREFIX)
 });
 
 beforeEach(async () => {
@@ -44,7 +45,8 @@ beforeEach(async () => {
     password: 'Passw0rd!',
     email: 'johndoe@example.com',
   };
-  const response = await request.post('/staff/register').send(newDoctor);
+  const response = await request.post(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/register').send(newDoctor);
+  console.log(response.body);
   doctorId = response.body._id;
   userId = response.body.userId;
 });
@@ -62,7 +64,7 @@ afterAll(async () => {
 describe('STAFF TEST', () => {
   describe('test POST /staff/register', () => {
     it('should return 400 if required fields are missing', async () => {
-      const response = await request.post('/staff/register').send({});
+      const response = await request.post(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/register').send({});
       expect(response.status).toBe(400);
       //expect(response.body.message).toBe('All fields are required.');
     });
@@ -83,7 +85,7 @@ describe('STAFF TEST', () => {
         .post('/users')
         .reply(201, { _id: uuidv4() });
 
-      const response = await request.post('/staff/register').send(newDoctor2);
+      const response = await request.post(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/register').send(newDoctor2);
       expect(response.status).toBe(201);
       expect(response.body.name).toBe(newDoctor2.name);
       expect(response.body.surname).toBe(newDoctor2.surname);
@@ -92,13 +94,13 @@ describe('STAFF TEST', () => {
 
   describe('test GET /staff/clinic/:clinicId/speciality/:speciality?', () => {
     it('should return 200 and all doctors for a clinic', async () => {
-      const response = await request.get('/staff/clinic/27163ac7-4f4d-4669-a0c1-4b8538405475/speciality/cardiology');
+      const response = await request.get(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/clinic/27163ac7-4f4d-4669-a0c1-4b8538405475/speciality/cardiology');
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
     });
 
     it('should return 404 if no doctors are found for the given clinic and speciality', async () => {      
-      const response = await request.get('/staff/clinic/1854ab8f-41c5-4de9-b027-4acbd276320a/speciality/NonExistentSpeciality');
+      const response = await request.get(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/clinic/1854ab8f-41c5-4de9-b027-4acbd276320a/speciality/NonExistentSpeciality');
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('No doctors found for the given clinicId and speciality');
     });
@@ -106,7 +108,7 @@ describe('STAFF TEST', () => {
   
   describe('test GET /staff/:doctorId', () => {
     it('should return 200 and the doctor if the doctor is found', async () => {
-      const response = await request.get(`/staff/${doctorId}`);
+      const response = await request.get(process.env.API_PREFIX || process.env.VITE_API_PREFIX + `/staff/${doctorId}`);
       expect(response.status).toBe(200);
       expect(response.body._id).toBe(doctorId);
       expect(response.body.name).toBe('John');
@@ -114,7 +116,7 @@ describe('STAFF TEST', () => {
     });
 
     it('should return 404 if the doctor is not found', async () => {
-      const response = await request.get(`/staff/${uuidv4()}`);
+      const response = await request.get(process.env.API_PREFIX || process.env.VITE_API_PREFIX + `/staff/${uuidv4()}`);
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('Doctor not found');
     });
@@ -129,7 +131,7 @@ describe('STAFF TEST', () => {
       );
 
       request.set('Cookie', `token=${doctorToken}`);
-      const response = await request.get('/staff/me');
+      const response = await request.get(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/me');
       expect(response.status).toBe(200);
       expect(response.body._id).toBe(doctorId);
       expect(response.body.name).toBe('John');
@@ -143,7 +145,7 @@ describe('STAFF TEST', () => {
       );
       request.set('Cookie', `token=${anotherDoctorToken}`);
 
-      const response = await request.get('/staff/me');
+      const response = await request.get(process.env.API_PREFIX || process.env.VITE_API_PREFIX + '/staff/me');
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('Authenticated doctor not found');
     });
@@ -151,14 +153,14 @@ describe('STAFF TEST', () => {
 
   describe('test PUT /staff/:doctorId', () => {
     it('should return 404 if doctor is not found', async () => {
-      const response = await request.put(`/staff/${uuidv4()}`).send({ specialty: 'neurology' });
+      const response = await request.put(process.env.API_PREFIX || process.env.VITE_API_PREFIX + `/staff/${uuidv4()}`).send({ specialty: 'neurology' });
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('Doctor not found');
     });
 
     it('should return 200 and update the doctor speciality if valid fields are provided', async () => {
       const updatedData = { specialty: 'neurology' };
-      const response = await request.put(`/staff/${doctorId}`).send(updatedData);
+      const response = await request.put(process.env.API_PREFIX || process.env.VITE_API_PREFIX + `/staff/${doctorId}`).send(updatedData);
       expect(response.status).toBe(200);
       expect(response.body.doctor.specialty).toBe(updatedData.specialty);
     });
@@ -166,13 +168,13 @@ describe('STAFF TEST', () => {
 
   describe('test DELETE /staff/:doctorId', () => {
     it('should return 404 if doctor is not found', async () => {
-      const response = await request.delete(`/staff/${uuidv4()}`);
+      const response = await request.delete(process.env.API_PREFIX || process.env.VITE_API_PREFIX + `/staff/${uuidv4()}`);
       expect(response.status).toBe(404);
       expect(response.body.message).toBe('Doctor not found');
     });
 
     it('should return 204 if doctor is successfully deleted', async () => {
-      const response = await request.delete(`/staff/${doctorId}`);
+      const response = await request.delete(process.env.API_PREFIX || process.env.VITE_API_PREFIX + `/staff/${doctorId}`);
       expect(response.status).toBe(204);
     });
   });
