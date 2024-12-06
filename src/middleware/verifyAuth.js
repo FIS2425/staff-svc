@@ -30,7 +30,6 @@ export const verifyAuth = (req, res, next) => {
       return res.status(403).send({ error: 'Access denied: Insufficient permissions' });
     }
     req.user = decoded;
-    req.token = token;
     next();
   } catch (error) {
     logger.error('Error on token validation', {

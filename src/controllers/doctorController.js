@@ -20,6 +20,14 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'A doctor with the same DNI already exists' });
     }
 
+    const doctor = new Doctor({
+      name,
+      surname,
+      specialty,
+      dni,
+      clinicId,
+    });
+
     try {
       const authResponse = await axios.post(`${AUTH_SVC}/users`, {
         password,
@@ -28,18 +36,11 @@ export const register = async (req, res) => {
       }, {
         withCredentials: true,
         headers: {
-          Cookie: `token=${req.token}`
+          Cookie: `token=${req.cookies.token}`
         }
       });
 
-      const doctor = new Doctor({
-        name,
-        surname,
-        specialty,
-        dni,
-        clinicId,
-        userId: authResponse.data._id
-      });
+      doctor.userId = authResponse.data._id;
 
       await doctor.save();
       logger.info(`Doctor ${doctor._id} created`, {
@@ -242,7 +243,7 @@ export const deleteDoctor = async (req, res) => {
         const authResponse = await axios.delete(`${AUTH_SVC}/users/${doctor.userId}`, {
           withCredentials: true,
           headers: {
-            Cookie: `token=${req.token}`
+            Cookie: `token=${req.cookies.token}`
           }
         });
         
