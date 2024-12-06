@@ -48,8 +48,8 @@
   "dependencies": {
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
-    "express": "4.21.1",
-    "mongoose": "8.8.3",
+    "express": "4.21.2",
+    "mongoose": "8.8.4",
     "swagger-ui-express": "5.0.1",
     "winston": "3.17.0",
     "yamljs": "0.3.0"
