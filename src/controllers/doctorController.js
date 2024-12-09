@@ -4,7 +4,7 @@ import axios from 'axios';
 import logger from '../config/logger.js';
 import { registerValidator } from '../utils/validation.js';
 
-const AUTH_SVC = process.env.AUTH_SVC || process.env.VITE_AUTH_SVC;
+const AUTH_SVC = process.env.AUTH_SVC || 'http://auth-svc:3001';
 
 export const register = async (req, res) => {
   try {
@@ -29,7 +29,7 @@ export const register = async (req, res) => {
     });
 
     try {
-      const authResponse = await axios.post(`${AUTH_SVC}/users`, {
+      const authResponse = await axios.post(`${AUTH_SVC }/users`, {
         password,
         email,
         roles: ['doctor']

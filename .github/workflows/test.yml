@@ -9,12 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      AUTH_SVC: ${{ secrets.AUTH_SVC }}
-      VITE_AUTH_SVC: ${{ secrets.AUTH_SVC }}
-      API_PREFIX: ${{ secrets.API_PREFIX }}
-      VITE_API_PREFIX: ${{ secrets.API_PREFIX }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      VITE_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      VITE_JWT_SECRET: ${{ secrets.VITE_JWT_SECRET }}
     steps:
       - name: Checkout ⬇️
         uses: actions/checkout@v4.2.2
