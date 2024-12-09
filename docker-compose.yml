@@ -1,19 +1,17 @@
-version: "3.8"
-
 services:
   mongodb:
     restart: unless-stopped
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongodb-staff
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGOADMIN}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGOPASS}
     networks:
-      - backend
+      - backend-staff
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongo-data-staff:/data/db
 
   staff-svc:
     restart: unless-stopped
@@ -22,20 +20,25 @@ services:
       dockerfile: Dockerfile
     container_name: staff-svc
     environment:
-      - MONGODB_URL=${MONGOURL}
-      - PORT=3001
+      - PORT=3007
+      - MONGOADMIN=${MONGOADMIN}
+      - MONGOPASS=${MONGOPASS}
+      - MONGOURL=${MONGOURL}
+      - NODE_ENV=production
+      - API_PREFIX=/api/v1
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SVC=${AUTH_SVC}
+      - KAFKA_HOST=${KAFKA_HOST}
     depends_on:
       - mongodb
     networks:
-      - backend
+      - backend-staff
     ports:
-      - "3001:3001"
-    volumes:
-      - .:/staff-svc
+      - "3007:3007"
 
 volumes:
-  mongo-data:
+  mongo-data-staff:
 
 networks:
-  backend:
+  backend-staff:
     driver: bridge
