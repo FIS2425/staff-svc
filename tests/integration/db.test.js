@@ -4,7 +4,7 @@ import Doctor from '../../src/schemas/Doctor';
 
 beforeAll(async () => {
   // Conectar a la base de datos antes de ejecutar los tests
-  await mongoose.connect(process.env.MONGOURL || process.env.VITE_MONGOURL);
+  await mongoose.connect(process.env.VITE_MONGOURL);
 });
 
 afterAll(async () => {
