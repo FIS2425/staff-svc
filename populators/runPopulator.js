@@ -1,75 +1,22 @@
-import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import Doctor from '../src/schemas/Doctor.js';
+import { exec } from 'child_process';
 
-const MONGO_URI = process.env.MONGOURL;
+const populatorName = process.argv[2];
 
-const connectToDatabase = async () => {
-  mongoose
-    .connect(MONGO_URI)
-    .then(() => {
-      console.log('MongoDB connection successful');
-    })
-    .catch((error) => {
-      console.error('MongoDB connection error:', error.message);
-    });
-};
-
-// Sample user data
-const sampleStaff = [
-  {
-    _id: uuidv4(),
-    name: 'clinic',
-    surname: 'admin',
-    specialty: 'cardiology',
-    dni: '10000004H',
-    userId: '27163ac7-4f4d-4669-a0c1-4b8538405475',
-    clinicId: '27163ac7-4f4d-4669-a0c1-4b8538405475'
-  },
-  {
-    _id: uuidv4(),
-    name: 'Doctor',
-    surname: 'First',
-    specialty: 'neurology',
-    dni: '64781738F',
-    userId: 'af1520a8-2d04-441e-ba19-aef5faf45dc8',
-    clinicId: '27163ac7-4f4d-4669-a0c1-4b8538405475'
-  },
-  {
-    _id: uuidv4(),
-    name: 'Doctor',
-    surname: 'Second',
-    specialty: 'neurology',
-    dni: '20060493P',
-    userId: '679f55e3-a3cd-4a47-aebd-13038c1528a0',
-    clinicId: '5b431574-d2ab-41d3-b1dd-84b06f2bd1a0'
-  }
-];
-
-async function populateStaff() {
-  try {
-    // Delete sample users (unique email addresses) if they already exist
-    await Doctor.deleteMany({
-      dni: { $in: sampleStaff.map((doctor) => doctor.dni) },
-    });
-
-    // Save each user with plain-text passwords (they will be hashed by the schema's pre-save hook)
-    for (const userData of sampleStaff) {
-      const doctor = new Doctor(userData);
-      await doctor.save();
-      console.log(`Doctor ${doctor.dni} created successfully`);
-    }
-
-    console.log('All sample staff have been created');
-  } catch (error) {
-    console.error('Error populating users:', error);
-  } finally {
-    mongoose.disconnect();
-  }
+if (!populatorName) {
+  console.error("Por favor, proporciona el nombre del archivo populator (por ejemplo, 'Appointments').");
+  process.exit(1);
 }
 
-// Run the script
-(async () => {
-  await connectToDatabase();
-  await populateStaff();
-})();
+const populatorPath = `./populators/${populatorName}.js`;
+
+exec(`node --env-file=.env ${populatorPath}`, (error, stdout, stderr) => {
+  if (error) {
+    console.error(`Error al ejecutar el populator: ${error.message}`);
+    return;
+  }
+  if (stderr) {
+    console.error(`Error: ${stderr}`);
+    return;
+  }
+  console.log(stdout);
+});
