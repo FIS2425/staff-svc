@@ -8,15 +8,10 @@ const AUTH_SVC = process.env.AUTH_SVC || 'http://auth-svc:3001';
 
 export const register = async (req, res) => {
   try {
-    const { name, surname, specialty, dni, password, email } = req.body;
+    const { name, surname, specialty, dni, clinicId, password, email } = req.body;
     const { error } = registerValidator().validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
-    }
-
-    const clinicAdmin = await Doctor.findOne({ userId: req.user.userId})
-    if (!clinicAdmin) {
-      return res.status(401).json({ message: 'The user who made the request is no staff' });
     }
 
     // Check if a doctor with the same DNI already exists
@@ -30,7 +25,7 @@ export const register = async (req, res) => {
       surname,
       specialty,
       dni,
-      clinicId: clinicAdmin.clinicId,
+      clinicId,
     });
 
     try {
@@ -77,7 +72,6 @@ export const register = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
-
 // Get me
 export const getMe = async (req, res) => {
   try {
