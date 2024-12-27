@@ -21,7 +21,6 @@ export const registerValidator = () => {
       }
       return value;
     }),
-    clinicId: Joi.string().required(),
     password: Joi.string()
       .min(8)
       .max(32)
