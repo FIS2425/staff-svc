@@ -46,7 +46,6 @@ spec:
               - --quiet
             initialDelaySeconds: 15
             periodSeconds: 5
-            timeoutSeconds: 5
           ports:
             - containerPort: 27017
               protocol: TCP
