@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 import Doctor from '../src/schemas/Doctor.js';
 
 const MONGO_URI = process.env.MONGOURL;
@@ -18,7 +17,7 @@ const connectToDatabase = async () => {
 // Sample user data
 const sampleStaff = [
   {
-    _id: uuidv4(),
+    _id: '27163ac7-4f4d-4669-a0c1-4b8538405475',
     name: 'clinic',
     surname: 'admin',
     specialty: 'cardiology',
@@ -27,7 +26,7 @@ const sampleStaff = [
     clinicId: '27163ac7-4f4d-4669-a0c1-4b8538405475'
   },
   {
-    _id: uuidv4(),
+    _id: 'fea82b90-c146-4ea6-91b3-85a73c82e259',
     name: 'Doctor',
     surname: 'First',
     specialty: 'neurology',
@@ -36,7 +35,7 @@ const sampleStaff = [
     clinicId: '27163ac7-4f4d-4669-a0c1-4b8538405475'
   },
   {
-    _id: uuidv4(),
+    _id: 'a1ac971e-7188-4eaa-859c-7b2249e3c46b',
     name: 'Doctor',
     surname: 'Second',
     specialty: 'neurology',
