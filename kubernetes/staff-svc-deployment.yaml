@@ -58,7 +58,7 @@ spec:
               value: production
             - name: PORT
               value: "3007"
-          image: ghcr.io/fis2425/staff:1.0.2
+          image: ghcr.io/fis2425/staff:latest
           name: staff-svc
           ports:
             - containerPort: 3007
