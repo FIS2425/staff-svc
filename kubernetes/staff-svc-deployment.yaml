@@ -39,16 +39,6 @@ spec:
                 secretKeyRef:
                   name: staff-secrets
                   key: KAFKA_HOST
-            - name: MONGOADMIN
-              valueFrom:
-                secretKeyRef:
-                  name: staff-secrets
-                  key: MONGOADMIN
-            - name: MONGOPASS
-              valueFrom:
-                secretKeyRef:
-                  name: staff-secrets
-                  key: MONGOPASS
             - name: MONGOURL
               valueFrom:
                 secretKeyRef:
@@ -58,7 +48,7 @@ spec:
               value: production
             - name: PORT
               value: "3007"
-          image: ghcr.io/fis2425/staff:1.0.2
+          image: ghcr.io/fis2425/staff:latest
           name: staff-svc
           ports:
             - containerPort: 3007
