@@ -39,16 +39,6 @@ spec:
                 secretKeyRef:
                   name: staff-secrets
                   key: KAFKA_HOST
-            - name: MONGOADMIN
-              valueFrom:
-                secretKeyRef:
-                  name: staff-secrets
-                  key: MONGOADMIN
-            - name: MONGOPASS
-              valueFrom:
-                secretKeyRef:
-                  name: staff-secrets
-                  key: MONGOPASS
             - name: MONGOURL
               valueFrom:
                 secretKeyRef:
