@@ -5,6 +5,7 @@ import logger from '../config/logger.js';
 import { registerValidator } from '../utils/validation.js';
 
 const AUTH_SVC = process.env.AUTH_SVC || 'http://auth-svc:3001';
+const PAYMENT_SVC = process.env.PAYMENT_SVC || 'http://payment-svc:3003';
 
 export const register = async (req, res) => {
   try {
@@ -16,13 +17,61 @@ export const register = async (req, res) => {
 
     const clinicAdmin = await Doctor.findOne({ userId: req.user.userId})
     if (!clinicAdmin) {
-      return res.status(401).json({ message: 'The user who made the request is no staff' });
+      return res.status(401).json({ message: 'The user who made the request is not a clinic admin' });
     }
 
     // Check if a doctor with the same DNI already exists
     const existingDoctor = await Doctor.findOne({ dni });
     if (existingDoctor) {
       return res.status(400).json({ message: 'A doctor with the same DNI already exists' });
+    }
+
+    const clinic = await axios.get(`${PAYMENT_SVC}/clinics/${clinicAdmin.clinicId}`,
+      { 
+        withCredentials: true,
+        headers: {
+          Cookie: `token=${req.cookies.token}`
+        }
+      });
+
+    if (clinic.status !== 200) {
+      return res.status(500).json({ message: 'Error getting clinic information' });
+    }
+
+    const plan = await axios.get(`${PAYMENT_SVC}/plans/${clinic.data.plan}`,
+      { 
+        withCredentials: true,
+        headers: {
+          Cookie: `token=${req.cookies.token}`
+        }
+      });
+
+    if (plan.status !== 200) {
+      return res.status(500).json({ message: 'Error getting plan information' });
+    }
+    const nDoctorInClinic = await Doctor.countDocuments({ clinicId: clinicAdmin.clinicId });
+
+    switch (plan.data.name) {
+    case 'Basic':
+      if (nDoctorInClinic >= 2) {
+        return res.status(401).json({ message: 'Clinic has reached the maximum number of doctors for Basic' });
+      }
+      break;
+    case 'Advanced':
+      if (nDoctorInClinic >= 15) {
+        return res.status(401).json({ message: 'Clinic has reached the maximum number of doctors for Advanced' });
+      }
+      break;
+    case 'Professional':
+      if (nDoctorInClinic >= 35) {
+        return res.status(401).json({ message: 'Clinic has reached the maximum number of doctors for Professional' });
+      }
+      break;
+    case 'Enterprise':
+      // No maximum limit for Plan Tres
+      break;
+    default:
+      return res.status(401).json({ message: 'Invalid clinic plan' });
     }
 
     const doctor = new Doctor({

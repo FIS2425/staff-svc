@@ -29,6 +29,11 @@ spec:
                 secretKeyRef:
                   name: staff-secrets
                   key: AUTH_SVC
+            - name: PAYMENT_SVC
+              valueFrom:
+                secretKeyRef:
+                  name: staff-secrets
+                  key: PAYMENT_SVC
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
