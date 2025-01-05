@@ -47,10 +47,8 @@ const sampleStaff = [
 
 async function populateStaff() {
   try {
-    // Delete sample users (unique email addresses) if they already exist
-    await Doctor.deleteMany({
-      dni: { $in: sampleStaff.map((doctor) => doctor.dni) },
-    });
+    // Delete all doctors
+    await Doctor.deleteMany({});
 
     // Save each user with plain-text passwords (they will be hashed by the schema's pre-save hook)
     for (const userData of sampleStaff) {
