@@ -29,6 +29,11 @@ spec:
                 secretKeyRef:
                   name: staff-secrets
                   key: AUTH_SVC
+            - name: PAYMENT_SVC
+              valueFrom:
+                secretKeyRef:
+                  name: staff-secrets
+                  key: PAYMENT_SVC
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -39,16 +44,6 @@ spec:
                 secretKeyRef:
                   name: staff-secrets
                   key: KAFKA_HOST
-            - name: MONGOADMIN
-              valueFrom:
-                secretKeyRef:
-                  name: staff-secrets
-                  key: MONGOADMIN
-            - name: MONGOPASS
-              valueFrom:
-                secretKeyRef:
-                  name: staff-secrets
-                  key: MONGOPASS
             - name: MONGOURL
               valueFrom:
                 secretKeyRef:

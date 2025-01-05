@@ -29,6 +29,13 @@ beforeEach(async () => {
     .delete(/\/users\/.*/)
     .reply(204);
 
+  nock('http://payment-svc:3003')
+    .get(/\/clinics\/.*/)
+    .reply(200);
+  nock('http://payment-svc:3003')
+    .get(/\/plans\/.*/)
+    .reply(200, { name: 'Professional' });
+
   const token = jwt.sign(
     { userId: clinicAdminUser._id, roles: clinicAdminUser.roles },
     process.env.VITE_JWT_SECRET,
@@ -93,6 +100,13 @@ describe('STAFF TEST', () => {
       nock('http://auth-svc:3001')
         .post('/users')
         .reply(201, { _id: uuidv4() });
+      
+      nock('http://payment-svc:3003')
+        .get(/\/clinics\/.*/)
+        .reply(200);
+      nock('http://payment-svc:3003')
+        .get(/\/plans\/.*/)
+        .reply(200, { name: 'Professional' });
 
       const response = await request.post('/staff/register').send(newDoctor2);
       expect(response.status).toBe(201);
