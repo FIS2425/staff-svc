@@ -8,12 +8,11 @@ metadata:
     io.kompose.service: staff-svc
   name: staff-svc
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - protocol: TCP
       name: "3007"
       port: 3007
       targetPort: 3007
-      nodePort: 30007
   selector:
     io.kompose.service: staff-svc
