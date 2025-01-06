@@ -17,7 +17,7 @@ export const register = async (req, res) => {
 
     const clinicAdmin = await Doctor.findOne({ userId: req.user.userId})
     if (!clinicAdmin) {
-      return res.status(401).json({ message: 'The user who made the request is not a clinic admin' });
+      return res.status(403).json({ message: 'The user who made the request is not a clinic admin' });
     }
 
     // Check if a doctor with the same DNI already exists
@@ -54,24 +54,24 @@ export const register = async (req, res) => {
     switch (plan.data.name) {
     case 'Basic':
       if (nDoctorInClinic >= 2) {
-        return res.status(401).json({ message: 'Clinic has reached the maximum number of doctors for Basic' });
+        return res.status(403).json({ message: 'Clinic has reached the maximum number of doctors for Basic' });
       }
       break;
     case 'Advanced':
       if (nDoctorInClinic >= 15) {
-        return res.status(401).json({ message: 'Clinic has reached the maximum number of doctors for Advanced' });
+        return res.status(403).json({ message: 'Clinic has reached the maximum number of doctors for Advanced' });
       }
       break;
     case 'Professional':
       if (nDoctorInClinic >= 35) {
-        return res.status(401).json({ message: 'Clinic has reached the maximum number of doctors for Professional' });
+        return res.status(403).json({ message: 'Clinic has reached the maximum number of doctors for Professional' });
       }
       break;
     case 'Enterprise':
       // No maximum limit for Plan Tres
       break;
     default:
-      return res.status(401).json({ message: 'Invalid clinic plan' });
+      return res.status(403).json({ message: 'Invalid clinic plan' });
     }
 
     const doctor = new Doctor({
