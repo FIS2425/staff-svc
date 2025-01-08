@@ -34,7 +34,17 @@ beforeEach(async () => {
     .reply(200);
   nock('http://payment-svc:3003')
     .get(/\/plans\/.*/)
-    .reply(200, { name: 'Professional' });
+    .reply(200, { 
+      _id: '550e8400-e29b-41d4-a716-446655440000',
+      name: 'Basic',
+      price: 15,
+      features: [
+        '1 clinic',
+        'Max File Size: 0.5 GB',
+        '200 doctors per clinic',
+        '350 patients per clinic',
+        'Clinical History Format: PDF',
+      ], });
 
   const token = jwt.sign(
     { userId: clinicAdminUser._id, roles: clinicAdminUser.roles },
@@ -106,7 +116,17 @@ describe('STAFF TEST', () => {
         .reply(200);
       nock('http://payment-svc:3003')
         .get(/\/plans\/.*/)
-        .reply(200, { name: 'Professional' });
+        .reply(200, { 
+          _id: '550e8400-e29b-41d4-a716-446655440000',
+          name: 'Basic',
+          price: 15,
+          features: [
+            '1 clinic',
+            'Max File Size: 0.5 GB',
+            '200 doctors per clinic',
+            '350 patients per clinic',
+            'Clinical History Format: PDF',
+          ], });
 
       const response = await request.post('/staff/register').send(newDoctor2);
       expect(response.status).toBe(201);
