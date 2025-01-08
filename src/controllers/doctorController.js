@@ -51,27 +51,19 @@ export const register = async (req, res) => {
     }
     const nDoctorInClinic = await Doctor.countDocuments({ clinicId: clinicAdmin.clinicId });
 
-    switch (plan.data.name) {
-    case 'Basic':
-      if (nDoctorInClinic >= 2) {
-        return res.status(403).json({ message: 'Clinic has reached the maximum number of doctors for Basic' });
-      }
-      break;
-    case 'Advanced':
-      if (nDoctorInClinic >= 15) {
-        return res.status(403).json({ message: 'Clinic has reached the maximum number of doctors for Advanced' });
-      }
-      break;
-    case 'Professional':
-      if (nDoctorInClinic >= 35) {
-        return res.status(403).json({ message: 'Clinic has reached the maximum number of doctors for Professional' });
-      }
-      break;
-    case 'Enterprise':
-      // No maximum limit for Plan Tres
-      break;
-    default:
-      return res.status(403).json({ message: 'Invalid clinic plan' });
+    const features = plan.data.features;
+    if (!features) {
+      return res.status(500).json({ message: 'Plan features are not available' });
+    }
+  
+    const maxDoctorsFeature = features.find(feature => feature.includes('doctors per clinic'));
+    if (!maxDoctorsFeature) {
+      return res.status(500).json({ message: 'Error getting plan features' });
+    }
+    const maxDoctors = parseInt(maxDoctorsFeature.split(' ')[0]);
+          
+    if (nDoctorInClinic >= maxDoctors) {
+      return res.status(403).json({ message: `Clinic has reached the maximum number of doctors for ${plan.data.name}` });
     }
 
     const doctor = new Doctor({
